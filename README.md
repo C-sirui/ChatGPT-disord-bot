@@ -10,7 +10,7 @@
 * `/chat [message]` Start chat. It will create a bot only listening to you, and remeber chat history.
 * `/private` Bot will reply privately
 * `/public`  Bot will reply publically
-* **Attension**: Bots in private and public mode are different bots.
+* Bots in private and public mode are different bots.
 
 # Setup
 
