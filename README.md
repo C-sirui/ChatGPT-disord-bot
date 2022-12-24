@@ -1,7 +1,7 @@
 # ChatGPT-disord-bot
 
 > **Warning**
-> Due to the CloudFlare issue, the bot is using davinci-3 (the chatgpt api) to function.
+> #### Due to the CloudFlare issue, the bot is using davinci-3 (the chatgpt api) to function.
 > #### Also since it remembers all history in one execution, it will consume tokens quicker than usual.
 > #### openai==0.25.0, discord.py==2.1.0
 
