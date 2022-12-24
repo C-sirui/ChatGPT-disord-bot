@@ -3,7 +3,7 @@ import time
 import discord
 import json
 from discord import app_commands
-from response import Conversation
+from chatgpt import Conversation
 
 
 with open('config.json', 'r') as JSON:

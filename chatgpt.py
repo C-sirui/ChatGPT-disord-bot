@@ -70,37 +70,5 @@ class Conversation:
             return json_dict
 
 
-        
-    
-# a = Conversation("The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.")
-# while True:
-#     mes = input("Human: ")
-#     a.chat(mes)
-
-
-# def start_conversation(intial_prompt):mk;
-#     history = f"{intial_prompt}"
-#     while True:
-#         mes = input("Human: ")
-#         history += f"\nHuman: {mes}"
-#         response = openai.Completion.create(
-#             model="text-davinci-003",
-#             prompt=history,
-#             temperature=0.9,
-#             max_tokens=150,
-#             top_p=1,
-#             frequency_penalty=0.0,
-#             presence_penalty=0.6,
-#             stop=[" Human:", " AI:"]
-#         )
-#         res = response.choices[0].text
-#         res = res.strip()
-#         history += f"\nAI: {res}"
-#         print(
-#             f"***\n{response.choices[0].text}\n***"
-#         )
-# start_conversation("The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.")
-
-
 
 
