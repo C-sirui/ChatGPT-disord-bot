@@ -7,7 +7,11 @@
 # Features
 
 * `/chat [message]` Start chat. It will create a bot only listening to you.
-* `/private` bot will reply privately
-* `/public`  bot will reply publically
-* **Attension**
+* `/private` Bot will reply privately
+* `/public`  Bot will reply publically
+* **Attension**: Bots in private and public mode are different bots.
+
+# Setup
+
+## Change `config.dev.json` to `config.json`
 
