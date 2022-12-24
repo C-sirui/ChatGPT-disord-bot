@@ -18,7 +18,7 @@
 ## Create a bot
 
 1. Change `config.dev.json` to `config.json`
-2. Create an application at [here](https://discord.com/developers/applications) and [create a bot](https://discordpy.readthedocs.io/en/stable/discord.html) to your server with read and send message permissions.
+2. Create an application from [here](https://discord.com/developers/applications) and [create a bot](https://discordpy.readthedocs.io/en/stable/discord.html) to your server with read and send message permissions.
 3. Copy bot token to `discord_bot_token` in config.json
 
 ## Create an openai api
