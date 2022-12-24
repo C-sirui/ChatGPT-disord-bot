@@ -13,5 +13,9 @@
 
 # Setup
 
-## Change `config.dev.json` to `config.json`
+## Fill up settings
+
+1. Change `config.dev.json` to `config.json`
+2. Create an application at [here](https://discord.com/developers/applications) and [create a bot](https://discordpy.readthedocs.io/en/stable/discord.html) in it.
+3. Add the bot to your channel
 
