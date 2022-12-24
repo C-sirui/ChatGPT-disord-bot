@@ -29,7 +29,7 @@
 ## Run the bot from desktop
 
 1. Copy [channal id](https://turbofuture.com/internet/Discord-Channel-ID) to config.json
-2. run "python discord-bot.py" in cmd
+2. run "python discord-bot.py" in cmd under in the folder
 
 
 
