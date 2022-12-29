@@ -31,12 +31,12 @@ class Conversation:
             response = openai.Completion.create(
                 model="text-davinci-003",
                 prompt=self.history,
-                temperature=0.9,
+                temperature=,
                 max_tokens=150,
                 top_p=1,
                 frequency_penalty=0.0,
                 presence_penalty=0.6,
-                stop=[" Human:", " AI:"]
+                stop=["\nHuman:"]
             )
         except:
             print(f"Check your api: {self.openAI_key}")
@@ -53,7 +53,7 @@ class Conversation:
             top_p=self.top_p,
             frequency_penalty=self.frequency_penalty,
             presence_penalty=self.presence_penalty,
-            stop=[" Human:", " AI:"]
+            stop=["\nHuman:"]
         )
         res = response.choices[0].text
         res = res.strip()
