@@ -53,7 +53,7 @@ class Conversation:
             top_p=self.top_p,
             frequency_penalty=self.frequency_penalty,
             presence_penalty=self.presence_penalty,
-            stop=["\nHuman:"]
+            stop=["\nHuman:"] ## problematic, sometimes lost the next paragraph???
         )
         res = response.choices[0].text
         res = res.strip()
