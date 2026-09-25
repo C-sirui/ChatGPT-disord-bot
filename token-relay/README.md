@@ -12,6 +12,7 @@ client, and they pay per token from a prepaid balance.
 
 * **Design draft and obstacles:** [docs/DESIGN.md](docs/DESIGN.md)
 * **Dev build and debugging guide:** [docs/DEBUGGING.md](docs/DEBUGGING.md)
+* **Obstacle questionnaire (fill in your decisions):** [docs/OBSTACLE_QUESTIONNAIRE.md](docs/OBSTACLE_QUESTIONNAIRE.md)
 
 ## Quick start (dev build)
 
