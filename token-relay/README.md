@@ -14,6 +14,7 @@ client, and they pay per token from a prepaid balance.
 * **Dev build and debugging guide:** [docs/DEBUGGING.md](docs/DEBUGGING.md)
 * **Obstacle questionnaire (fill in your decisions):** [docs/OBSTACLE_QUESTIONNAIRE.md](docs/OBSTACLE_QUESTIONNAIRE.md), with answers so far in [docs/DECISIONS.md](docs/DECISIONS.md)
 * **Deploying the backend (Fly.io + Postgres + Stripe):** [docs/DEPLOY.md](docs/DEPLOY.md)
+* **Hosting on a Raspberry Pi, and machine sizing (measured):** [docs/RASPBERRY_PI.md](docs/RASPBERRY_PI.md)
 
 ## Quick start (dev build)
 

@@ -4,7 +4,9 @@
   "private": true,
   "description": "OpenAI-compatible LLM relay and capacity marketplace",
   "type": "module",
-  "engines": { "node": ">=22.18" },
+  "engines": {
+    "node": ">=22.18"
+  },
   "scripts": {
     "dev": "TR_ENV=development node --disable-warning=ExperimentalWarning --watch src/main.ts",
     "dev:debug": "TR_ENV=development node --disable-warning=ExperimentalWarning --inspect src/main.ts",
@@ -15,7 +17,8 @@
     "print-config": "node --disable-warning=ExperimentalWarning src/cli.ts print-config",
     "cli": "node --disable-warning=ExperimentalWarning src/cli.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "TR_ENV=test node --disable-warning=ExperimentalWarning --test --test-concurrency=1 'test/**/*.test.ts'"
+    "test": "TR_ENV=test node --disable-warning=ExperimentalWarning --test --test-concurrency=1 'test/**/*.test.ts'",
+    "loadtest": "node scripts/loadtest.mjs"
   },
   "dependencies": {
     "pg": "^8.13.0"

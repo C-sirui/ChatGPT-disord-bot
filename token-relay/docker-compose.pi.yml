@@ -1,0 +1,50 @@
+# Raspberry Pi (arm64) home deployment: Postgres + relay + Cloudflare Tunnel.
+# No open router ports; HTTPS terminates at Cloudflare. See docs/RASPBERRY_PI.md.
+#   cp .env.example .env   # fill in secrets + CLOUDFLARE_TUNNEL_TOKEN
+#   docker compose -f docker-compose.pi.yml up -d --build
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: relay
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-relay}
+      POSTGRES_DB: relay
+    # Sized for a Pi with 8 GB RAM; data lives on the SSD mount, not the SD card.
+    command: ["postgres", "-c", "shared_buffers=512MB", "-c", "effective_cache_size=2GB", "-c", "max_connections=60", "-c", "wal_compression=on"]
+    volumes: ["${DATA_DIR:-/mnt/ssd/token-relay}/pg:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U relay"]
+      interval: 5s
+      retries: 20
+
+  migrate:
+    build: .
+    command: ["node", "dist/cli.js", "migrate"]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://relay:${POSTGRES_PASSWORD:-relay}@db:5432/relay
+    depends_on:
+      db: { condition: service_healthy }
+
+  relay:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://relay:${POSTGRES_PASSWORD:-relay}@db:5432/relay
+      TR_SERVER__TRUST_PROXY: "true"
+      TR_DB__POOL_MAX: "15"
+      NODE_OPTIONS: "--max-old-space-size=1024"
+    expose: ["8787"]          # reachable only through the tunnel, not from your LAN or router
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    stop_grace_period: 30s
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: ["tunnel", "--no-autoupdate", "run"]
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on: [relay]

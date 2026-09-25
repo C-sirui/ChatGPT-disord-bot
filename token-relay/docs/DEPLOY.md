@@ -11,7 +11,8 @@ three things:
 | Payments | **Stripe** (Checkout for top-ups; Connect Express for payouts, Phase 2) | none |
 
 Cost to start: roughly $10–30/month (two small app machines plus a small
-Postgres).
+Postgres). For machine sizing, and for running everything on a Raspberry Pi,
+see [RASPBERRY_PI.md](RASPBERRY_PI.md).
 
 ## 1. Create the database
 
