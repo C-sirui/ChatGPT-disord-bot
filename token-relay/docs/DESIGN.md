@@ -1,6 +1,6 @@
 # Token Relay — Design Draft (v0.1)
 
-Status: **draft** · Owner: token-relay team · Last updated: 2026-09-25
+Status: **draft, Phase 1 implemented on this branch** · Last updated: 2026-09-25
 
 ## 1. What we are building
 
@@ -295,7 +295,24 @@ in-memory ring buffer (`debug.ringSize`).
 * **Cline / Roo**: API provider "OpenAI Compatible", with the same base URL
   and key.
 
-## 13. Roadmap
+## 13. Implementation status and known limitations (Phase 1)
+
+Implemented and tested (33 tests, run on both SQLite and Postgres):
+everything in §4 to §11 except the items below.
+
+Engineering limitations that came up during the build:
+
+| # | Limitation | Impact | Planned fix |
+|---|---|---|---|
+| L1 | Rate limits, per-user concurrency and circuit breakers are in memory **per replica**. | With N replicas the limits are up to N× looser, and breaker state is not shared. | Redis token bucket and a shared breaker (Phase 2). Capacity budgets are already exact across replicas because they live in the database. |
+| L2 | The SSRF check on seller `baseUrl` runs when the credential is registered. | A DNS-rebinding seller could point a host at internal IPs later. | Pin the resolved IP per request through a custom undici dispatcher, and deploy relay nodes in an egress-only network segment. |
+| L3 | Holds are estimated from characters, not from the model's tokenizer. | Holds are conservative (they overestimate), which can reject requests near a zero balance. | Per-model tokenizer (tiktoken / HF) in the estimate path. |
+| L4 | Settlement happens before the response ends. This gives consistent balances for back-to-back requests. | Adds about 1 to 5 ms to the tail of each response. | Acceptable. Revisit if p99 matters. |
+| L5 | Concurrency is counted over the current and previous hour windows. | A stream longer than 2 h would drop out of the in-flight count. | This does not happen in practice, because of `upstreamIdleTimeoutMs`. |
+| L6 | Estimated usage (no upstream `usage`) is billed as-is. | It can drift from the provider's own count. | Nightly reconciliation job that compares against seller-exported provider usage. |
+| L7 | Payouts are recorded and approved by an admin. No money actually moves. | Operations work. | Stripe Connect Express payouts plus KYC gating (O9). |
+
+## 14. Roadmap
 
 * **Phase 1 (this branch):** gateway, ledger, capacity router, dev build,
   Postgres, Docker.

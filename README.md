@@ -1,3 +1,7 @@
+> **Token Relay** (OpenAI-compatible LLM gateway and capacity marketplace) is being built on the
+> `token-relay` branch in [`token-relay/`](token-relay/README.md). Start with the
+> [design draft and obstacle list](token-relay/docs/DESIGN.md).
+
 # ChatGPT-disord-bot
 
 > **Warning**

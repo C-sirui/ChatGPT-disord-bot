@@ -1,0 +1,36 @@
+# Production-like local stack: Postgres + relay (compiled build).
+#   cp .env.example .env && edit, then: docker compose up --build
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: relay
+      POSTGRES_PASSWORD: relay
+      POSTGRES_DB: relay
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U relay"]
+      interval: 5s
+      retries: 10
+
+  migrate:
+    build: .
+    command: ["node", "dist/cli.js", "migrate"]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://relay:relay@db:5432/relay
+    depends_on:
+      db: { condition: service_healthy }
+
+  relay:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://relay:relay@db:5432/relay
+    ports: ["8787:8787"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    stop_grace_period: 30s
+
+volumes:
+  pgdata:

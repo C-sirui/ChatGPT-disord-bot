@@ -1,0 +1,24 @@
+{
+  "server": { "host": "127.0.0.1" },
+  "db": { "driver": "sqlite", "sqlitePath": ".data/dev.sqlite", "autoMigrate": true },
+  "log": { "level": "debug", "format": "pretty", "logBodies": true },
+  "security": {
+    "masterKey": "ZGV2LW9ubHktbWFzdGVyLWtleS1kby1ub3QtdXNlISE=",
+    "masterKeyId": "dev",
+    "adminToken": "dev-admin-token",
+    "passwordMinLength": 4,
+    "scryptCost": 1024
+  },
+  "models": [
+    { "id": "mock-fast", "provider": "mock", "upstreamModel": "mock-fast", "inputUsdPerMTok": 1, "outputUsdPerMTok": 2, "maxOutput": 4096, "defaultMaxOutput": 256 },
+    { "id": "gpt-4o-mini", "provider": "openai", "upstreamModel": "gpt-4o-mini", "inputUsdPerMTok": 0.18, "outputUsdPerMTok": 0.72, "maxOutput": 16384, "defaultMaxOutput": 4096 }
+  ],
+  "providers": {
+    "mock": { "enabled": true, "resaleAcknowledged": true }
+  },
+  "credentials": { "validateOnCreate": false, "allowPrivateBaseUrls": true },
+  "payments": { "provider": "fake" },
+  "payouts": { "holdDays": 0 },
+  "debug": { "enabled": true, "timelineHeader": true, "allowLocalhostWithoutToken": true },
+  "dev": { "seed": true, "mockUpstream": { "enabled": true } }
+}

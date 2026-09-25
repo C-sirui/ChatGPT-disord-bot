@@ -1,0 +1,28 @@
+{
+  "name": "token-relay",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OpenAI-compatible LLM relay and capacity marketplace",
+  "type": "module",
+  "engines": { "node": ">=22.18" },
+  "scripts": {
+    "dev": "TR_ENV=development node --disable-warning=ExperimentalWarning --watch src/main.ts",
+    "dev:debug": "TR_ENV=development node --disable-warning=ExperimentalWarning --inspect src/main.ts",
+    "mock-upstream": "node src/dev/mock-upstream.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "TR_ENV=production node dist/main.js",
+    "migrate": "node --disable-warning=ExperimentalWarning src/cli.ts migrate",
+    "print-config": "node --disable-warning=ExperimentalWarning src/cli.ts print-config",
+    "cli": "node --disable-warning=ExperimentalWarning src/cli.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "TR_ENV=test node --disable-warning=ExperimentalWarning --test --test-concurrency=1 'test/**/*.test.ts'"
+  },
+  "dependencies": {
+    "pg": "^8.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/pg": "^8.11.0",
+    "typescript": "~5.9.0"
+  }
+}

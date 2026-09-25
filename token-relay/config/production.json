@@ -1,0 +1,6 @@
+{
+  "db": { "driver": "postgres" },
+  "log": { "level": "info", "format": "json", "logBodies": false },
+  "payments": { "provider": "stripe" },
+  "debug": { "enabled": false }
+}

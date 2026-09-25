@@ -1,0 +1,95 @@
+{
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8787,
+    "publicBaseUrl": "http://localhost:8787",
+    "bodyLimitBytes": 4194304,
+    "headersTimeoutMs": 30000,
+    "keepAliveTimeoutMs": 65000,
+    "shutdownGraceMs": 25000,
+    "trustProxy": false
+  },
+  "db": {
+    "driver": "postgres",
+    "sqlitePath": ".data/relay.sqlite",
+    "url": "",
+    "poolMax": 20,
+    "autoMigrate": false
+  },
+  "log": {
+    "level": "info",
+    "format": "json",
+    "logBodies": false
+  },
+  "security": {
+    "masterKey": "",
+    "masterKeyId": "k1",
+    "previousMasterKeys": {},
+    "adminToken": "",
+    "sessionTtlHours": 168,
+    "passwordMinLength": 10,
+    "scryptCost": 16384
+  },
+  "pricing": {
+    "takeRate": 0.2
+  },
+  "models": [
+    { "id": "gpt-4o-mini", "provider": "openai", "upstreamModel": "gpt-4o-mini", "inputUsdPerMTok": 0.18, "outputUsdPerMTok": 0.72, "maxOutput": 16384, "defaultMaxOutput": 4096 },
+    { "id": "gpt-4.1", "provider": "openai", "upstreamModel": "gpt-4.1", "inputUsdPerMTok": 2.4, "outputUsdPerMTok": 9.6, "maxOutput": 32768, "defaultMaxOutput": 4096 },
+    { "id": "llama-3.3-70b", "provider": "openai_compatible", "upstreamModel": "llama-3.3-70b-instruct", "inputUsdPerMTok": 0.5, "outputUsdPerMTok": 0.8, "maxOutput": 8192, "defaultMaxOutput": 2048 }
+  ],
+  "relay": {
+    "maxAttempts": 3,
+    "upstreamConnectTimeoutMs": 15000,
+    "upstreamIdleTimeoutMs": 120000,
+    "holdTtlMs": 900000,
+    "charsPerToken": 3,
+    "reaperIntervalMs": 60000,
+    "perKeyRequestsPerMinute": 120,
+    "perUserConcurrency": 8,
+    "rateLimitCooldownMs": 60000,
+    "breaker": { "failureThreshold": 3, "cooldownMs": 30000 }
+  },
+  "providers": {
+    "openai": { "enabled": true, "baseUrl": "https://api.openai.com/v1", "resaleAcknowledged": false },
+    "openai_compatible": { "enabled": true, "baseUrl": "", "resaleAcknowledged": false },
+    "mock": { "enabled": false, "baseUrl": "", "resaleAcknowledged": false }
+  },
+  "credentials": {
+    "validateOnCreate": true,
+    "allowPrivateBaseUrls": false
+  },
+  "payments": {
+    "provider": "stripe",
+    "minTopupUsd": 5,
+    "maxTopupUsd": 500,
+    "stripe": {
+      "secretKey": "",
+      "webhookSecret": "",
+      "successUrl": "http://localhost:8787/billing/success",
+      "cancelUrl": "http://localhost:8787/billing/cancel",
+      "apiBase": "https://api.stripe.com/v1"
+    }
+  },
+  "payouts": {
+    "minUsd": 10,
+    "holdDays": 14
+  },
+  "debug": {
+    "enabled": false,
+    "ringSize": 200,
+    "timelineHeader": false,
+    "allowLocalhostWithoutToken": false
+  },
+  "dev": {
+    "seed": false,
+    "mockUpstream": {
+      "enabled": false,
+      "port": 0,
+      "latencyMs": 20,
+      "chunkDelayMs": 5,
+      "faultRate": 0,
+      "faultStatus": 503
+    }
+  }
+}
