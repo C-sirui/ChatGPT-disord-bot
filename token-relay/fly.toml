@@ -1,0 +1,42 @@
+# Fly.io deployment for the relay backend. See docs/DEPLOY.md.
+# Change `app` to a globally unique name before `fly launch --copy-config --no-deploy`.
+app = "token-relay"
+primary_region = "iad"          # keep app machines in the same region as Postgres
+kill_signal = "SIGTERM"
+kill_timeout = 30               # >= server.shutdownGraceMs so in-flight streams can finish
+
+[build]
+  dockerfile = "Dockerfile"
+
+[deploy]
+  release_command = "node dist/cli.js migrate"   # runs once per deploy, before new machines start
+  strategy = "rolling"
+
+[env]
+  TR_ENV = "production"
+  PORT = "8787"
+  TR_SERVER__TRUST_PROXY = "true"
+  TR_SERVER__PUBLIC_BASE_URL = "https://token-relay.fly.dev"
+
+[http_service]
+  internal_port = 8787
+  force_https = true
+  auto_stop_machines = "off"    # long SSE streams and the hold reaper need warm machines
+  auto_start_machines = true
+  min_machines_running = 2      # two machines = zero-downtime rolling deploys
+
+  [http_service.concurrency]
+    type = "connections"
+    soft_limit = 800
+    hard_limit = 1000
+
+  [[http_service.checks]]
+    grace_period = "15s"
+    interval = "15s"
+    method = "GET"
+    path = "/readyz"
+    timeout = "3s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

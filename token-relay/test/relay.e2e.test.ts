@@ -333,3 +333,33 @@ describe('marketplace money flows', () => {
     assert.ok(ok.body.token.startsWith('trs_'));
   });
 });
+
+describe('self-hosted supply', () => {
+  test('self_hosted provider routes without a reseller agreement but needs seller attestation', async () => {
+    const t = await startTestApp({
+      models: [
+        { id: 'mock-fast', provider: 'mock', upstreamModel: 'mock-fast', inputUsdPerMTok: 1, outputUsdPerMTok: 2, maxOutput: 4096, defaultMaxOutput: 64 },
+        { id: 'llama-local', provider: 'self_hosted', upstreamModel: 'mock-fast', inputUsdPerMTok: 1, outputUsdPerMTok: 2, maxOutput: 4096, defaultMaxOutput: 64 },
+      ],
+    });
+    try {
+      const s = await t.user('host@test.dev');
+      const body = { provider: 'self_hosted', apiKey: 'mock-selfhost-key', baseUrl: t.mock.url, hourlyTokenLimit: 100_000 };
+      const refused = await t.req('POST', '/v1/seller/credentials', { token: s.token, body });
+      assert.equal(refused.status, 400);
+      assert.equal(refused.body.error.param, 'attestSelfHosted');
+      const ok = await t.req('POST', '/v1/seller/credentials', { token: s.token, body: { ...body, attestSelfHosted: true } });
+      assert.equal(ok.status, 201, ok.text);
+
+      const buyer = await t.buyer('hostb@test.dev', 1);
+      const models = (await t.req('GET', '/v1/models', { token: buyer.key })).body.data.map((m: { id: string }) => m.id);
+      assert.ok(models.includes('llama-local'));
+      const r = await t.chat(buyer.key, { model: 'llama-local' });
+      assert.equal(r.status, 200, r.text);
+      assert.equal(t.mock.requests.at(-1)!.auth, 'mock-selfhost-key');
+      await assertReconciled(t);
+    } finally {
+      await t.close();
+    }
+  });
+});

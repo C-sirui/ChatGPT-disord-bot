@@ -14,6 +14,7 @@ interface Options {
   requiresBaseUrl: boolean;
   /** OpenAI's newer models reject `max_tokens`; compatible servers mostly expect it. */
   maxTokensField: 'max_tokens' | 'max_completion_tokens';
+  requiresSelfHostAttestation?: boolean;
   forwardHeaderPrefixes?: string[];
 }
 
@@ -28,6 +29,7 @@ export function openAiLike(o: Options): ProviderAdapter {
     id: o.id,
     resalePolicy: o.resalePolicy,
     requiresBaseUrl: o.requiresBaseUrl,
+    requiresSelfHostAttestation: o.requiresSelfHostAttestation ?? false,
     buildChatRequest(input: BuildInput): UpstreamRequest {
       const body: Record<string, unknown> = { ...input.body, model: input.model.upstreamModel };
       if (body.max_tokens === undefined && body.max_completion_tokens === undefined) body[o.maxTokensField] = input.maxOutput;

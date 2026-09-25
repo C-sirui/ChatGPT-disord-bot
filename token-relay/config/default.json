@@ -36,7 +36,7 @@
   "models": [
     { "id": "gpt-4o-mini", "provider": "openai", "upstreamModel": "gpt-4o-mini", "inputUsdPerMTok": 0.18, "outputUsdPerMTok": 0.72, "maxOutput": 16384, "defaultMaxOutput": 4096 },
     { "id": "gpt-4.1", "provider": "openai", "upstreamModel": "gpt-4.1", "inputUsdPerMTok": 2.4, "outputUsdPerMTok": 9.6, "maxOutput": 32768, "defaultMaxOutput": 4096 },
-    { "id": "llama-3.3-70b", "provider": "openai_compatible", "upstreamModel": "llama-3.3-70b-instruct", "inputUsdPerMTok": 0.5, "outputUsdPerMTok": 0.8, "maxOutput": 8192, "defaultMaxOutput": 2048 }
+    { "id": "llama-3.3-70b", "provider": "self_hosted", "upstreamModel": "llama-3.3-70b-instruct", "inputUsdPerMTok": 0.5, "outputUsdPerMTok": 0.8, "maxOutput": 8192, "defaultMaxOutput": 2048 }
   ],
   "relay": {
     "maxAttempts": 3,
@@ -52,6 +52,7 @@
   },
   "providers": {
     "openai": { "enabled": true, "baseUrl": "https://api.openai.com/v1", "resaleAcknowledged": false },
+    "self_hosted": { "enabled": true, "baseUrl": "", "resaleAcknowledged": false },
     "openai_compatible": { "enabled": true, "baseUrl": "", "resaleAcknowledged": false },
     "mock": { "enabled": false, "baseUrl": "", "resaleAcknowledged": false }
   },

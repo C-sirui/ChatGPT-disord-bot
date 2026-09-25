@@ -43,6 +43,8 @@ export interface CreateCredentialInput {
   models?: string[];
   hourlyTokenLimit: number;
   maxConcurrency?: number;
+  /** Required for self_hosted: the seller confirms they run the model server themselves. */
+  attestSelfHosted?: boolean;
 }
 
 export async function createCredential(d: Deps, sellerId: string, input: CreateCredentialInput): Promise<PublicCredential> {
@@ -51,6 +53,9 @@ export async function createCredential(d: Deps, sellerId: string, input: CreateC
   if (!providerCfg || !adapter || !providerCfg.enabled) throw badRequest(`Provider "${input.provider}" is not supported`, 'provider');
   if (adapter.resalePolicy === 'prohibited') {
     throw new ApiError(422, 'provider_resale_prohibited', `Provider "${input.provider}" does not permit capacity resale`);
+  }
+  if (adapter.requiresSelfHostAttestation && input.attestSelfHosted !== true) {
+    throw badRequest('Confirm with "attestSelfHosted": true that you operate this model server yourself (not a proxy to another provider)', 'attestSelfHosted');
   }
   const catalog = d.cfg.models.filter((m) => m.provider === input.provider).map((m) => m.id);
   const models = input.models ?? catalog;

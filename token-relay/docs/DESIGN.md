@@ -146,7 +146,7 @@ interface ProviderAdapter {
 }
 ```
 
-Shipped: `openai` (api.openai.com), `openai_compatible` (a base URL per
+Shipped: `self_hosted` (seller-run vLLM/Ollama/TGI servers, with seller attestation; resale permitted; the default supply), `openai` (api.openai.com), `openai_compatible` (a base URL per
 credential; covers vLLM, Ollama, OpenRouter, Together, Groq, DeepSeek and
 similar), and `mock` (dev and test). Anthropic and Gemini translation adapters
 are phase 2.

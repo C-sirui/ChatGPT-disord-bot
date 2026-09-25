@@ -12,7 +12,8 @@ client, and they pay per token from a prepaid balance.
 
 * **Design draft and obstacles:** [docs/DESIGN.md](docs/DESIGN.md)
 * **Dev build and debugging guide:** [docs/DEBUGGING.md](docs/DEBUGGING.md)
-* **Obstacle questionnaire (fill in your decisions):** [docs/OBSTACLE_QUESTIONNAIRE.md](docs/OBSTACLE_QUESTIONNAIRE.md)
+* **Obstacle questionnaire (fill in your decisions):** [docs/OBSTACLE_QUESTIONNAIRE.md](docs/OBSTACLE_QUESTIONNAIRE.md), with answers so far in [docs/DECISIONS.md](docs/DECISIONS.md)
+* **Deploying the backend (Fly.io + Postgres + Stripe):** [docs/DEPLOY.md](docs/DEPLOY.md)
 
 ## Quick start (dev build)
 

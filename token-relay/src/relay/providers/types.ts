@@ -29,6 +29,8 @@ export interface ProviderAdapter {
    */
   readonly resalePolicy: ResalePolicy;
   readonly requiresBaseUrl: boolean;
+  /** Seller must attest the endpoint is infrastructure they run (no third-party provider terms involved). */
+  readonly requiresSelfHostAttestation?: boolean;
   buildChatRequest(input: BuildInput): UpstreamRequest;
   classifyError(status: number): ErrorClass;
   validate(input: { cfg: Config; secret: string; baseUrl: string | null }): Promise<{ ok: boolean; detail?: string }>;

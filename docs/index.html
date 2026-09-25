@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Token Relay Decisions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+[hidden]{display:none!important} body{margin:0}
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --surface-2: #eef2f5;
+  --ink: #16202a;
+  --muted: #5a6774;
+  --line: #d6dde4;
+  --accent: #0d6a88;
+  --accent-ink: #ffffff;
+  --accent-soft: #e0eff4;
+  --sev-existential: #b42318;
+  --sev-high: #b85709;
+  --sev-medium: #836400;
+  --sev-low: #3a7536;
+  --ok: #2f7d4f;
+  --warn: #9a6400;
+  --focus: #0d6a88;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0e1317; --surface: #161e24; --surface-2: #1c262d; --ink: #e3e9ee; --muted: #9aa8b4;
+    --line: #2a363f; --accent: #5cb4d0; --accent-ink: #06222c; --accent-soft: #173440;
+    --sev-existential: #f07a6e; --sev-high: #f0a060; --sev-medium: #d9b85a; --sev-low: #8cc98a;
+    --ok: #7cc79a; --warn: #e0b25a; --focus: #5cb4d0;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0e1317; --surface: #161e24; --surface-2: #1c262d; --ink: #e3e9ee; --muted: #9aa8b4;
+  --line: #2a363f; --accent: #5cb4d0; --accent-ink: #06222c; --accent-soft: #173440;
+  --sev-existential: #f07a6e; --sev-high: #f0a060; --sev-medium: #d9b85a; --sev-low: #8cc98a;
+  --ok: #7cc79a; --warn: #e0b25a; --focus: #5cb4d0;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); padding-inline: 16px; padding-block: 0 64px; }
+.wrap { max-width: 1120px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+code, .mono { font-family: var(--mono); font-size: 0.88em; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+header.top { padding-block: 36px 20px; display: grid; gap: 14px; border-bottom: 1px solid var(--line); }
+.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+header.top h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 700; letter-spacing: -.01em; }
+header.top p { margin: 0; max-width: 68ch; color: var(--muted); }
+.statusline { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; font: 500 12px/1 var(--mono); padding: 6px 9px; border-radius: 999px; background: var(--surface-2); color: var(--ink); border: 1px solid var(--line); }
+.pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+.pill.good .dot { background: var(--ok); }
+.pill.warn .dot { background: var(--warn); }
+
+.tabs { display: flex; gap: 4px; margin-block: 20px 24px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+.tabs button { font: 600 14px/1 var(--display); letter-spacing: .02em; background: none; border: 0; border-bottom: 2px solid transparent; color: var(--muted); padding: 12px 14px; cursor: pointer; white-space: nowrap; }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+
+.layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; align-items: start; }
+@media (max-width: 860px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+
+nav.index { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: grid; gap: 14px; }
+@media (max-width: 860px) { nav.index { position: static; } }
+.progress { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 8px; }
+.progress .count { font: 700 26px/1 var(--display); font-variant-numeric: tabular-nums; }
+.progress .count span { font-size: 15px; color: var(--muted); font-weight: 500; }
+.bar { height: 6px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+.save-state { font: 12px/1.3 var(--mono); color: var(--muted); }
+.index ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+@media (max-width: 860px) { .index ol { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } }
+.index a { display: grid; grid-template-columns: 30px 1fr 10px; align-items: center; gap: 6px; padding: 7px 8px; border-radius: 6px; text-decoration: none; color: var(--ink); font-size: 13.5px; line-height: 1.25; }
+.index a:hover { background: var(--surface-2); }
+.index .oid { font: 500 12px/1 var(--mono); color: var(--muted); }
+.sdot { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--muted); }
+.sdot[data-s="decided"] { background: var(--ok); border-color: var(--ok); }
+.sdot[data-s="research"] { background: var(--warn); border-color: var(--warn); }
+
+.cards { display: grid; gap: 18px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; scroll-margin-top: 16px; }
+.card-head { display: grid; gap: 8px; padding: 18px 20px 14px; border-bottom: 1px solid var(--line); }
+.card-head .row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.card-head h2 { font-size: 21px; font-weight: 600; }
+.sev { font: 600 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: 5px 7px; border-radius: 4px; border: 1px solid currentColor; }
+.sev[data-v="existential"] { color: var(--sev-existential); }
+.sev[data-v="high"] { color: var(--sev-high); }
+.sev[data-v="medium"] { color: var(--sev-medium); }
+.sev[data-v="low"] { color: var(--sev-low); }
+.card-head p { margin: 0; color: var(--muted); max-width: 72ch; }
+.today { font-size: 13.5px; background: var(--surface-2); border-radius: 6px; padding: 8px 10px; color: var(--ink); }
+.today b { font-weight: 600; }
+.card-body { padding: 16px 20px 18px; display: grid; gap: 18px; }
+fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 8px; min-width: 0; }
+legend { font-weight: 600; padding: 0; margin-bottom: 8px; font-size: 14.5px; }
+.opts { display: grid; gap: 6px; }
+.opt { display: grid; grid-template-columns: 18px 1fr; gap: 10px; align-items: start; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; background: var(--surface); }
+.opt:hover { border-color: var(--accent); }
+.opt:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.opt input { margin: 3px 0 0; accent-color: var(--accent); }
+.opt small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.opt .rec { font: 500 10.5px/1 var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--accent); margin-left: 6px; }
+label.field { display: grid; gap: 6px; font-weight: 600; font-size: 14.5px; }
+label.field span.hint { font-weight: 400; color: var(--muted); font-size: 13px; }
+textarea, input[type="number"], input[type="text"], select { font: 14px/1.5 var(--body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; width: 100%; }
+textarea { min-height: 96px; resize: vertical; }
+input[type="number"] { max-width: 160px; font-variant-numeric: tabular-nums; }
+.card-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between; padding: 12px 20px; border-top: 1px solid var(--line); background: var(--surface-2); }
+.statuspick { display: flex; flex-wrap: wrap; gap: 6px; }
+.statuspick label { font: 500 12.5px/1 var(--body); padding: 7px 10px; border: 1px solid var(--line); border-radius: 999px; cursor: pointer; background: var(--surface); }
+.statuspick input { position: absolute; opacity: 0; pointer-events: none; }
+.statuspick label:has(input:checked) { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.statuspick label:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+.cardsave { font: 12px/1 var(--mono); color: var(--muted); }
+.cardsave.ok { color: var(--ok); }
+.cardsave.err { color: var(--sev-existential); }
+
+.notice { border: 1px solid var(--line); border-left: 4px solid var(--warn); background: var(--surface); border-radius: 8px; padding: 12px 14px; font-size: 14px; }
+
+/* Preview tab */
+.preview { display: grid; gap: 22px; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: grid; gap: 10px; align-content: start; }
+.panel h3 { font-size: 18px; font-weight: 600; }
+.panel ul { margin: 0; padding-left: 18px; display: grid; gap: 5px; }
+.panel p { margin: 0; color: var(--muted); }
+pre { margin: 0; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow-x: auto; font: 12.5px/1.6 var(--mono); color: var(--ink); }
+.flow { overflow-x: auto; }
+.flow svg { display: block; min-width: 720px; width: 100%; height: auto; }
+.flow text { font-family: var(--mono); font-size: 12px; fill: var(--ink); }
+.flow .sub { fill: var(--muted); font-size: 11px; }
+.flow rect.box { fill: var(--surface); stroke: var(--line); stroke-width: 1.2; }
+.flow rect.hot { fill: var(--accent-soft); stroke: var(--accent); }
+.flow path { stroke: var(--muted); stroke-width: 1.4; fill: none; }
+.flow .ah { fill: var(--muted); }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 12px/1.2 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.tablewrap { overflow-x: auto; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Token Relay · branch token-relay · Phase 1</div>
+    <h1>Token Relay decisions</h1>
+    <p>Twelve obstacles stand between the Phase 1 code and a launch. For each one, pick an approach, write how you would solve it, and mark its status. On this GitHub preview, answers stay in your browser. <a href="https://github.com/C-sirui/ChatGPT-disord-bot/tree/token-relay/token-relay">View the code</a>.</p>
+    <div class="statusline">
+      <span class="pill good"><span class="dot"></span>34 / 34 tests passing (SQLite + Postgres)</span>
+      <span class="pill good"><span class="dot"></span>Production build verified</span>
+      <span class="pill good"><span class="dot"></span>On GitHub: branch token-relay</span>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tab-q" aria-selected="true" aria-controls="panel-q">Obstacle questionnaire</button>
+    <button role="tab" id="tab-p" aria-selected="false" aria-controls="panel-p">Project preview</button>
+  </div>
+
+  <section id="panel-q" role="tabpanel" aria-labelledby="tab-q">
+    <div id="storage-note" class="notice" hidden></div>
+    <div class="layout" style="margin-top:12px">
+      <nav class="index" aria-label="Obstacles">
+        <div class="progress">
+          <div class="count" id="count">0 <span>of 12 decided</span></div>
+          <div class="bar"><i id="bar"></i></div>
+          <div class="save-state" id="save-state">Connecting to storage…</div>
+        </div>
+        <ol id="index"></ol>
+      </nav>
+      <div class="cards" id="cards"></div>
+    </div>
+  </section>
+
+  <section id="panel-p" role="tabpanel" aria-labelledby="tab-p" hidden>
+    <div class="preview">
+      <div class="panel">
+        <h3>What a request goes through</h3>
+        <p>Every call from an editor follows this path. The highlighted steps are where money and capacity get reserved and settled.</p>
+        <div class="flow">
+          <svg viewBox="0 0 980 150" role="img" aria-label="Request pipeline: editor, auth and rate limit, hold funds, route and reserve capacity, upstream provider, stream back, meter and settle">
+            <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0 L10,5 L0,10 z" style="stroke:none"/></marker></defs>
+            <g>
+              <rect class="box" x="6" y="40" width="110" height="60" rx="8"/><text x="61" y="66" text-anchor="middle">Editor</text><text class="sub" x="61" y="84" text-anchor="middle">Cursor / VS Code</text>
+              <rect class="box" x="146" y="40" width="120" height="60" rx="8"/><text x="206" y="66" text-anchor="middle">Auth + limits</text><text class="sub" x="206" y="84" text-anchor="middle">trk_ key, rpm</text>
+              <rect class="box hot" x="296" y="40" width="110" height="60" rx="8"/><text x="351" y="66" text-anchor="middle">Hold funds</text><text class="sub" x="351" y="84" text-anchor="middle">wallet reserve</text>
+              <rect class="box hot" x="436" y="40" width="130" height="60" rx="8"/><text x="501" y="66" text-anchor="middle">Route + reserve</text><text class="sub" x="501" y="84" text-anchor="middle">hourly budget</text>
+              <rect class="box" x="596" y="40" width="120" height="60" rx="8"/><text x="656" y="66" text-anchor="middle">Seller's key</text><text class="sub" x="656" y="84" text-anchor="middle">upstream API</text>
+              <rect class="box" x="746" y="40" width="100" height="60" rx="8"/><text x="796" y="66" text-anchor="middle">Stream</text><text class="sub" x="796" y="84" text-anchor="middle">SSE passthrough</text>
+              <rect class="box hot" x="866" y="40" width="108" height="60" rx="8"/><text x="920" y="66" text-anchor="middle">Settle</text><text class="sub" x="920" y="84" text-anchor="middle">ledger entries</text>
+              <path d="M116,70 H144" marker-end="url(#ar)"/><path d="M266,70 H294" marker-end="url(#ar)"/><path d="M406,70 H434" marker-end="url(#ar)"/><path d="M566,70 H594" marker-end="url(#ar)"/><path d="M716,70 H744" marker-end="url(#ar)"/><path d="M846,70 H864" marker-end="url(#ar)"/>
+              <path d="M656,40 C656,12 501,12 501,38" marker-end="url(#ar)"/><text class="sub" x="578" y="18" text-anchor="middle">429 / 5xx before first byte: next seller</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="panel">
+          <h3>Built in Phase 1</h3>
+          <ul>
+            <li>OpenAI-compatible <code>/v1/chat/completions</code> (streaming) and <code>/v1/models</code></li>
+            <li>Buyer accounts, relay keys, prepaid balance, Stripe Checkout + signed webhooks</li>
+            <li>Seller keys encrypted at rest, hourly token budgets, concurrency caps, earnings, payout requests</li>
+            <li>Double-entry ledger with holds and a reconcile check</li>
+            <li>Failover, circuit breakers, per-provider resale gate</li>
+            <li>Postgres, migrations, Docker, CI, health and metrics endpoints</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Dev build</h3>
+          <ul>
+            <li>One command: SQLite, built-in fake provider, seeded buyer, seller and admin accounts</li>
+            <li>Per-request timeline in a header, the logs and <code>/debug/requests/:id</code></li>
+            <li><code>/debug/config</code> shows each setting's source with secrets hidden</li>
+            <li>Fault injection: <code>x-mock-fault: 429 | 500 | 401 | hang | drop | no-usage</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Try it locally</h3>
+        <pre>cd token-relay && npm install && npm run dev
+
+curl -s localhost:8787/v1/chat/completions \
+  -H 'authorization: Bearer trk_dev_buyer_0000000000000000000000000000000' \
+  -H 'content-type: application/json' \
+  -d '{"model":"mock-fast","stream":true,"messages":[{"role":"user","content":"hello"}]}'</pre>
+        <p>Editor setup: base URL <code>http://localhost:8787/v1</code>, the key above, model <code>mock-fast</code>.</p>
+      </div>
+
+      <div class="panel">
+        <h3>Repository layout</h3>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Path</th><th>Contents</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">docs/DESIGN.md</td><td>Design draft, obstacles O1–O12, known limits L1–L7</td></tr>
+              <tr><td class="mono">docs/DEBUGGING.md</td><td>Dev build, timelines, fault injection, config cheatsheet</td></tr>
+              <tr><td class="mono">src/relay/pipeline.ts</td><td>Request pipeline: hold, route, failover, stream, settle</td></tr>
+              <tr><td class="mono">src/domain/</td><td>Users, keys, encrypted credentials, wallet, ledger, billing, payouts</td></tr>
+              <tr><td class="mono">src/config/</td><td>Layered config, strict validation, production safety rails</td></tr>
+              <tr><td class="mono">src/dev/</td><td>Fake OpenAI server and seed data</td></tr>
+              <tr><td class="mono">migrations/</td><td>SQL schema shared by SQLite and Postgres</td></tr>
+              <tr><td class="mono">test/</td><td>Unit and end-to-end suites</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const OBSTACLES = [
+  { id: "O1", title: "Provider terms of service", sev: "existential",
+    problem: "Most providers forbid sharing or reselling access. Free and hourly quotas are personal. Sellers risk bans; the platform risks legal claims.",
+    today: "Every provider is blocked until an operator sets resaleAcknowledged after legal review. API keys only; no consumer sessions.",
+    questions: [
+      { key: "supply", type: "checkbox", label: "Which supply will you launch with?", options: [
+        { v: "self_hosted", t: "Sellers' own self-hosted open models", d: "vLLM, Ollama or TGI endpoints the seller runs. No third-party terms involved.", rec: true },
+        { v: "reseller_agreement", t: "Providers with a signed reseller agreement", d: "Needs a contract per provider." },
+        { v: "aggregators", t: "Aggregators whose terms allow resale", d: "Verify each one's terms in writing first." },
+        { v: "consumer_quota", t: "Free or consumer-plan quotas", d: "Violates most terms. Accounts get banned." } ] },
+      { key: "legal", type: "radio", label: "Legal review", options: [
+        { v: "counsel_per_provider", t: "Counsel reviews each provider before enabling it", rec: true },
+        { v: "self_hosted_first", t: "Launch self-hosted only, review providers later" },
+        { v: "undecided", t: "Not decided" } ] } ] },
+  { id: "O2", title: "Stolen and leaked keys", sev: "high",
+    problem: "People can list leaked API keys. Buyers can use stolen cards.",
+    today: "The same key can't be listed twice. Keys are validated on registration. Payouts wait a hold period.",
+    questions: [
+      { key: "kyc", type: "radio", label: "When do sellers verify their identity?", options: [
+        { v: "before_listing", t: "Before listing any key", d: "Strongest; slows onboarding." },
+        { v: "before_payout", t: "Before the first payout", d: "Stripe Identity or Connect onboarding.", rec: true },
+        { v: "none_beta", t: "Not during a closed beta" } ] },
+      { key: "holdDays", type: "number", label: "Payout hold period (days)", hint: "Earnings wait this long before they can be withdrawn. Current default: 14.", min: 0, max: 120 } ] },
+  { id: "O3", title: "Prompt privacy", sev: "high",
+    problem: "Buyer code and prompts go through a stranger's account, where the seller can see them. The operator can see them too.",
+    today: "Prompt logging is forced off in production.",
+    questions: [
+      { key: "approach", type: "checkbox", label: "How will you protect buyers?", options: [
+        { v: "disclose", t: "Clear disclosure in buyer terms, shown at signup", rec: true },
+        { v: "trusted_tier", t: "A trusted-supply tier (vetted sellers only)" },
+        { v: "self_hosted_sensitive", t: "Sensitive tier routes only to attested self-hosted supply" },
+        { v: "seller_no_logging", t: "Sellers must agree not to log or read prompts" } ] } ] },
+  { id: "O4", title: "Metering accuracy", sev: "medium",
+    problem: "Some responses arrive without a usage count, for example when a stream is cut. Tokenizers differ by model.",
+    today: "Usage is requested upstream. When it's missing, the relay estimates at 3 characters per token and marks the charge as an estimate.",
+    questions: [
+      { key: "missingUsage", type: "radio", label: "When the provider reports no usage", options: [
+        { v: "bill_estimate", t: "Bill the estimate, flagged", rec: true },
+        { v: "bill_prompt_only", t: "Bill the prompt only" },
+        { v: "no_bill", t: "Don't bill; the platform absorbs it" } ] },
+      { key: "tokenizer", type: "radio", label: "Real tokenizers per model", options: [
+        { v: "now", t: "Add before launch" }, { v: "later", t: "Later; estimates are good enough for now", rec: true } ] } ] },
+  { id: "O5", title: "Money under concurrency", sev: "high",
+    problem: "Parallel streams from one buyer race on the same balance. Settlement can fail halfway through.",
+    today: "Atomic holds, one-transaction settlement, double-entry ledger, reaper for orphaned holds, reconcile check.",
+    questions: [
+      { key: "overage", type: "radio", label: "When a request costs more than its hold", options: [
+        { v: "allow_one", t: "Charge it; the balance may go slightly negative once", d: "Current behavior.", rec: true },
+        { v: "cap_to_balance", t: "Cap max_tokens so the cost can never exceed the balance" },
+        { v: "min_balance", t: "Require a minimum balance buffer (e.g. $1)" } ] } ] },
+  { id: "O6", title: "Capacity across servers", sev: "medium",
+    problem: "Hourly budgets must hold with many relay servers running.",
+    today: "Budgets live in the database and are reserved atomically. Rate limits and breakers are per server.",
+    questions: [
+      { key: "scale", type: "radio", label: "Launch topology", options: [
+        { v: "single", t: "One server at launch" },
+        { v: "multi_db", t: "Several servers, database-backed budgets only", rec: true },
+        { v: "redis", t: "Add Redis for shared rate limits and breakers" } ] } ] },
+  { id: "O7", title: "Provider differences", sev: "medium",
+    problem: "Error formats, rate-limit headers, streaming formats and tool calling differ between providers.",
+    today: "Adapters for OpenAI, any OpenAI-compatible server, and the fake provider.",
+    questions: [
+      { key: "next", type: "checkbox", label: "Which adapters come next?", options: [
+        { v: "anthropic", t: "Anthropic Messages API" }, { v: "gemini", t: "Google Gemini" },
+        { v: "openrouter_like", t: "Aggregators (OpenRouter-style)" }, { v: "local_runtimes", t: "More self-hosted runtimes (TGI, LM Studio)" } ] } ] },
+  { id: "O8", title: "Latency overhead", sev: "medium",
+    problem: "Editors are sensitive to latency, especially for autocomplete.",
+    today: "Streaming passthrough with no buffering. Two indexed database updates before the upstream call.",
+    questions: [
+      { key: "budgetMs", type: "number", label: "Acceptable added latency at p99 (ms)", hint: "Time the relay adds before the first token.", min: 0, max: 2000 },
+      { key: "regions", type: "radio", label: "Hosting regions", options: [
+        { v: "one_us", t: "One US region", rec: true }, { v: "us_eu", t: "US and EU" }, { v: "global", t: "Global edge" } ] } ] },
+  { id: "O9", title: "Payments and payouts", sev: "high",
+    problem: "Paying individuals needs identity checks, tax forms and possibly money-transmitter licensing.",
+    today: "Stripe Checkout for top-ups. Payouts are recorded and approved by an admin; no money moves yet.",
+    questions: [
+      { key: "payoutRail", type: "radio", label: "How do sellers get paid?", options: [
+        { v: "stripe_connect", t: "Stripe Connect Express", d: "Stripe handles identity checks and tax forms.", rec: true },
+        { v: "manual", t: "Manual transfers (PayPal, Wise)" },
+        { v: "credits_only", t: "No cash: sellers earn usage credits only", d: "Avoids payout regulation entirely." } ] },
+      { key: "countries", type: "radio", label: "Where can sellers be paid?", options: [
+        { v: "us", t: "US only at launch" }, { v: "us_eu", t: "US and EU" }, { v: "global", t: "Wherever the payout provider supports" } ] } ] },
+  { id: "O10", title: "Buyer abuse", sev: "high",
+    problem: "Buyers can send disallowed content through a seller's account, which gets the seller banned.",
+    today: "Per-key rate limits. Usage records show which buyer used which key.",
+    questions: [
+      { key: "moderation", type: "radio", label: "Content screening", options: [
+        { v: "moderation_api", t: "Screen prompts with a moderation model before routing" },
+        { v: "self_hosted_guard", t: "Self-hosted guard model (e.g. Llama Guard)" },
+        { v: "policy_reports", t: "Usage policy plus abuse reports; suspend on violation", rec: true },
+        { v: "none", t: "None for now" } ] } ] },
+  { id: "O11", title: "Seller key revoked mid-flight", sev: "low",
+    problem: "A seller can rotate or revoke a key at any time.",
+    today: "An unauthorized response marks the key invalid and the request moves to another seller.",
+    questions: [
+      { key: "notify", type: "checkbox", label: "How are sellers told?", options: [
+        { v: "email", t: "Email" }, { v: "dashboard", t: "Dashboard notice", rec: true }, { v: "webhook", t: "Webhook to the seller's endpoint" } ] } ] },
+  { id: "O12", title: "Pricing model", sev: "medium",
+    problem: "Sellers' costs differ, and buyers want predictable prices.",
+    today: "The platform sets a buyer price per model. Sellers earn the price minus a 20% take rate.",
+    questions: [
+      { key: "model", type: "radio", label: "Who sets prices?", options: [
+        { v: "platform", t: "The platform, per model", d: "Current behavior.", rec: true },
+        { v: "seller_asks", t: "Sellers set asks; cheapest capacity wins" },
+        { v: "hybrid", t: "Platform price with seller discounts" } ] },
+      { key: "takeRate", type: "number", label: "Take rate (%)", hint: "Platform share of each charge. Current default: 20.", min: 0, max: 100 } ] }
+];
+const STATUSES = [["undecided", "Undecided"], ["research", "Needs research"], ["decided", "Decided"]];
+
+const state = {};            // id -> {status, answers:{}, plan}
+const dirty = new Set();     // ids with local edits not yet written
+const pending = {};          // id -> timer
+const chains = {};           // id -> promise (one write at a time per doc)
+let db = null;
+let mode = "connecting";
+
+function blank() { return { status: "undecided", answers: {}, plan: "" }; }
+function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+function renderCards() {
+  const cards = document.getElementById("cards");
+  const index = document.getElementById("index");
+  cards.innerHTML = OBSTACLES.map((o) => {
+    const qs = o.questions.map((q, qi) => {
+      const name = `${o.id}-${q.key}`;
+      if (q.type === "number") {
+        return `<label class="field" for="${name}">${esc(q.label)}<span class="hint">${esc(q.hint || "")}</span>
+          <input type="number" id="${name}" data-o="${o.id}" data-k="${q.key}" min="${q.min}" max="${q.max}" inputmode="decimal"></label>`;
+      }
+      const opts = q.options.map((op, i) => `
+        <label class="opt" for="${name}-${i}">
+          <input type="${q.type}" id="${name}-${i}" name="${name}" value="${op.v}" data-o="${o.id}" data-k="${q.key}">
+          <span>${esc(op.t)}${op.rec ? '<span class="rec">suggested</span>' : ""}${op.d ? `<small>${esc(op.d)}</small>` : ""}</span>
+        </label>`).join("");
+      return `<fieldset><legend>${esc(q.label)}${q.type === "checkbox" ? ' <span class="hint" style="font-weight:400;color:var(--muted);font-size:13px">(pick any)</span>' : ""}</legend><div class="opts">${opts}</div></fieldset>`;
+    }).join("");
+    const status = STATUSES.map(([v, t]) => `<label><input type="radio" name="${o.id}-status" id="${o.id}-status-${v}" value="${v}" data-o="${o.id}" data-k="__status">${t}</label>`).join("");
+    return `<article class="card" id="${o.id}">
+      <div class="card-head">
+        <div class="row"><span class="mono" style="color:var(--muted)">${o.id}</span><h2>${esc(o.title)}</h2><span class="sev" data-v="${o.sev}">${o.sev}</span></div>
+        <p>${esc(o.problem)}</p>
+        <div class="today"><b>In the code today:</b> ${esc(o.today)}</div>
+      </div>
+      <div class="card-body">
+        ${qs}
+        <label class="field" for="${o.id}-plan">How would you solve it?<span class="hint">Your plan, constraints, open questions, links.</span>
+          <textarea id="${o.id}-plan" data-o="${o.id}" data-k="__plan" placeholder="Write your approach…"></textarea></label>
+      </div>
+      <div class="card-foot">
+        <div class="statuspick" role="radiogroup" aria-label="Status for ${o.id}">${status}</div>
+        <span class="cardsave" id="${o.id}-save"></span>
+      </div>
+    </article>`;
+  }).join("");
+  index.innerHTML = OBSTACLES.map((o) => `<li><a href="#${o.id}"><span class="oid">${o.id}</span><span>${esc(o.title)}</span><span class="sdot" id="${o.id}-dot"></span></a></li>`).join("");
+}
+
+function applyToForm(id) {
+  const s = state[id] || blank();
+  const o = OBSTACLES.find((x) => x.id === id);
+  for (const q of o.questions) {
+    const val = s.answers[q.key];
+    if (q.type === "number") {
+      document.getElementById(`${id}-${q.key}`).value = val ?? "";
+    } else {
+      document.querySelectorAll(`input[name="${id}-${q.key}"]`).forEach((el) => {
+        el.checked = q.type === "checkbox" ? Array.isArray(val) && val.includes(el.value) : val === el.value;
+      });
+    }
+  }
+  document.getElementById(`${id}-plan`).value = s.plan || "";
+  const st = document.getElementById(`${id}-status-${s.status || "undecided"}`);
+  if (st) st.checked = true;
+}
+
+function readForm(id) {
+  const o = OBSTACLES.find((x) => x.id === id);
+  const answers = {};
+  for (const q of o.questions) {
+    if (q.type === "number") {
+      const v = document.getElementById(`${id}-${q.key}`).value;
+      if (v !== "") answers[q.key] = Number(v);
+    } else if (q.type === "checkbox") {
+      answers[q.key] = [...document.querySelectorAll(`input[name="${id}-${q.key}"]:checked`)].map((e) => e.value);
+    } else {
+      const c = document.querySelector(`input[name="${id}-${q.key}"]:checked`);
+      if (c) answers[q.key] = c.value;
+    }
+  }
+  const status = document.querySelector(`input[name="${id}-status"]:checked`)?.value || "undecided";
+  return { status, answers, plan: document.getElementById(`${id}-plan`).value };
+}
+
+function refreshProgress() {
+  let decided = 0;
+  for (const o of OBSTACLES) {
+    const s = (state[o.id] || blank()).status;
+    if (s === "decided") decided++;
+    document.getElementById(`${o.id}-dot`).dataset.s = s;
+  }
+  document.getElementById("count").innerHTML = `${decided} <span>of 12 decided</span>`;
+  document.getElementById("bar").style.width = `${(decided / 12) * 100}%`;
+}
+
+function setCardSave(id, text, cls) {
+  const el = document.getElementById(`${id}-save`);
+  el.textContent = text;
+  el.className = "cardsave" + (cls ? " " + cls : "");
+}
+
+function lsGet() { try { return JSON.parse(localStorage.getItem("tr-decisions") || "{}"); } catch { return {}; } }
+function lsSet() { try { localStorage.setItem("tr-decisions", JSON.stringify(state)); } catch {} }
+
+async function write(id) {
+  const body = { ...state[id], obstacle: id, title: OBSTACLES.find((o) => o.id === id).title, updatedAt: new Date().toISOString() };
+  if (!db) { lsSet(); dirty.delete(id); setCardSave(id, "Saved in this browser", "ok"); return; }
+  setCardSave(id, "Saving…");
+  try {
+    await db.doc(`answers/${id}`).set(body);
+    dirty.delete(id);
+    setCardSave(id, "Saved", "ok");
+  } catch (e) {
+    lsSet();
+    setCardSave(id, e && e.code === "invalid_argument" ? "You can view but not edit these answers" : "Couldn't save. Kept in this browser; edit again to retry.", "err");
+  }
+}
+
+function onEdit(e) {
+  const id = e.target.dataset.o;
+  if (!id) return;
+  state[id] = readForm(id);
+  dirty.add(id);
+  refreshProgress();
+  setCardSave(id, "Unsaved changes");
+  clearTimeout(pending[id]);
+  const delay = e.target.tagName === "TEXTAREA" || e.target.type === "number" ? 900 : 250;
+  pending[id] = setTimeout(() => {
+    chains[id] = (chains[id] || Promise.resolve()).then(() => write(id));
+  }, delay);
+}
+
+function tabs() {
+  const tq = document.getElementById("tab-q"), tp = document.getElementById("tab-p");
+  const pq = document.getElementById("panel-q"), pp = document.getElementById("panel-p");
+  const show = (q) => {
+    tq.setAttribute("aria-selected", String(q)); tp.setAttribute("aria-selected", String(!q));
+    pq.hidden = !q; pp.hidden = q;
+    try { localStorage.setItem("tr-tab", q ? "q" : "p"); } catch {}
+  };
+  tq.addEventListener("click", () => show(true));
+  tp.addEventListener("click", () => show(false));
+  let saved = null; try { saved = localStorage.getItem("tr-tab"); } catch {}
+  if (location.hash === "#preview" || saved === "p") show(false);
+}
+
+function start() {
+  renderCards();
+  tabs();
+  Object.assign(state, lsGet());
+  OBSTACLES.forEach((o) => applyToForm(o.id));
+  refreshProgress();
+  document.getElementById("cards").addEventListener("input", onEdit);
+  document.getElementById("cards").addEventListener("change", onEdit);
+
+  const saveState = document.getElementById("save-state");
+  const note = document.getElementById("storage-note");
+  const use = window.claude && window.claude.use ? window.claude.use("db") : Promise.resolve(null);
+  Promise.resolve(use).then((handle) => {
+    if (!handle) {
+      mode = "local";
+      saveState.textContent = "Saving in this browser only";
+      note.hidden = false;
+      note.textContent = "This is the public GitHub Pages preview. Answers here stay in your browser only. To save them where Claude can read them, use the questionnaire on claude.ai: https://claude.ai/artifact/1cLDHNMqbBSPqo5qPwsugT";
+      return;
+    }
+    db = handle;
+    mode = "db";
+    saveState.textContent = "Answers save automatically";
+    db.collection("answers").onSnapshot((snap) => {
+      for (const d of snap.docs) {
+        if (!d.exists || dirty.has(d.id)) continue;
+        const data = d.data();
+        state[d.id] = { status: data.status || "undecided", answers: data.answers || {}, plan: data.plan || "" };
+        const active = document.activeElement;
+        if (!(active && active.dataset && active.dataset.o === d.id)) applyToForm(d.id);
+      }
+      refreshProgress();
+    }, () => { saveState.textContent = "Live updates paused; your edits still save"; });
+  }).catch(() => { saveState.textContent = "Saving in this browser only"; });
+}
+start();
+</script>
+
+</body>
+</html>

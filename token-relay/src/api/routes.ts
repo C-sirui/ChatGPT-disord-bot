@@ -124,6 +124,7 @@ export function buildRouter(app: AppContext): Router {
       models: models as string[] | undefined,
       hourlyTokenLimit: field.number(b, 'hourlyTokenLimit', { min: 1000, max: 1_000_000_000, int: true })!,
       maxConcurrency: field.number(b, 'maxConcurrency', { min: 1, max: 256, int: true, optional: true }),
+      attestSelfHosted: b.attestSelfHosted === true,
     });
     ctx.res.statusCode = 201;
     return cred;
