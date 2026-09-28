@@ -18,7 +18,7 @@ leaning and what it means for the code.
 | O9 Payouts | Stripe Connect Express, global | Phase 2. Stripe Connect covers about 45 countries, which is "global" in practice. |
 | O10 Abuse | Usage policy plus abuse reports | A report endpoint and suspend flow are needed; admin suspend already exists. |
 | O11 Revoked key | Dashboard notice; "keep the history context and switch model" | Editors resend the full conversation on every request, so failover before the first token already keeps context. Continuing a stream on another seller *mid-answer* is on the Phase 2 backlog. |
-| O12 Pricing | Platform sets prices | Already the behavior. |
+| O12 Pricing | Platform sets prices (**decided**) | Already the behavior. |
 
 ## O1 note
 

@@ -1,0 +1,127 @@
+{
+  "O1": {
+    "title": "Provider terms of service",
+    "status": "undecided",
+    "answers": {
+      "legal": "undecided",
+      "supply": [
+        "self_hosted",
+        "reseller_agreement",
+        "aggregators",
+        "consumer_quota"
+      ]
+    },
+    "plan": "NO legal bonds",
+    "updatedAt": "2026-09-25T16:56:16.114Z"
+  },
+  "O2": {
+    "title": "Stolen and leaked keys",
+    "status": "undecided",
+    "answers": {
+      "kyc": "before_payout"
+    },
+    "plan": "",
+    "updatedAt": "2026-09-25T16:56:18.108Z"
+  },
+  "O3": {
+    "title": "Prompt privacy",
+    "status": "undecided",
+    "answers": {
+      "approach": [
+        "disclose"
+      ]
+    },
+    "plan": "",
+    "updatedAt": "2026-09-25T16:56:24.624Z"
+  },
+  "O4": {
+    "title": "Metering accuracy",
+    "status": "undecided",
+    "answers": {
+      "missingUsage": "bill_estimate",
+      "tokenizer": "later"
+    },
+    "plan": "",
+    "updatedAt": "2026-09-25T16:56:32.980Z"
+  },
+  "O5": {
+    "title": "Money under concurrency",
+    "status": "undecided",
+    "answers": {
+      "overage": "allow_one"
+    },
+    "plan": "",
+    "updatedAt": "2026-09-25T16:56:36.871Z"
+  },
+  "O6": {
+    "title": "Capacity across servers",
+    "status": "undecided",
+    "answers": {
+      "scale": "multi_db"
+    },
+    "plan": "",
+    "updatedAt": "2026-09-25T16:57:02.552Z"
+  },
+  "O7": {
+    "title": "Provider differences",
+    "status": "undecided",
+    "answers": {
+      "next": [
+        "anthropic",
+        "gemini",
+        "openrouter_like",
+        "local_runtimes"
+      ]
+    },
+    "plan": "",
+    "updatedAt": "2026-09-25T16:57:21.540Z"
+  },
+  "O8": {
+    "title": "Latency overhead",
+    "status": "undecided",
+    "answers": {
+      "regions": "global"
+    },
+    "plan": "",
+    "updatedAt": "2026-09-25T16:57:26.800Z"
+  },
+  "O9": {
+    "title": "Payments and payouts",
+    "status": "undecided",
+    "answers": {
+      "countries": "global",
+      "payoutRail": "stripe_connect"
+    },
+    "plan": "",
+    "updatedAt": "2026-09-25T16:57:33.794Z"
+  },
+  "O10": {
+    "title": "Buyer abuse",
+    "status": "undecided",
+    "answers": {
+      "moderation": "policy_reports"
+    },
+    "plan": "",
+    "updatedAt": "2026-09-25T16:57:55.494Z"
+  },
+  "O11": {
+    "title": "Seller key revoked mid-flight",
+    "status": "undecided",
+    "answers": {
+      "notify": [
+        "dashboard"
+      ]
+    },
+    "plan": "keep the history context and switch model ",
+    "updatedAt": "2026-09-25T16:58:34.850Z"
+  },
+  "O12": {
+    "title": "Pricing model",
+    "status": "decided",
+    "answers": {
+      "model": "platform"
+    },
+    "plan": "",
+    "updatedAt": "2026-09-25T17:02:22.251Z"
+  }
+}

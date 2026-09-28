@@ -10,6 +10,7 @@ client, and they pay per token from a prepaid balance.
 > provider's terms. The relay refuses to route to a provider until an operator
 > sets `providers.<id>.resaleAcknowledged=true` after a legal review.
 
+* **Continuing in a new session? Start with [HANDOFF.md](HANDOFF.md)**
 * **Design draft and obstacles:** [docs/DESIGN.md](docs/DESIGN.md)
 * **Dev build and debugging guide:** [docs/DEBUGGING.md](docs/DEBUGGING.md)
 * **Obstacle questionnaire (fill in your decisions):** [docs/OBSTACLE_QUESTIONNAIRE.md](docs/OBSTACLE_QUESTIONNAIRE.md), with answers so far in [docs/DECISIONS.md](docs/DECISIONS.md)
